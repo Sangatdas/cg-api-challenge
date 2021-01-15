@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
 
@@ -26,9 +25,10 @@ public class EventListenerService {
 
     @PostConstruct
     public void listen() {
-        EthFilter filter = new EthFilter();
-        web3j.ethLogObservable(filter).subscribe(event -> {
-           logger.info("Address: " + event.getAddress() + "\tData: " + event.getData());
-        });
+        CGStaking contract = helper.loadContractFromAddress();
+        EthFilter filter = new EthFilter(DefaultBlockParameterName.LATEST,
+                DefaultBlockParameterName.LATEST,
+                contract.getContractAddress());
+        web3j.ethLogObservable(filter).subscribe(event -> logger.info("Address: " + event.getAddress() + "\tData: " + event.getData()));
     }
 }
